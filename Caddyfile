@@ -1,0 +1,5 @@
+# Ollama API auf Port 443
+https://:443 {
+    tls /etc/caddy/ssl/fullchain.pem /etc/caddy/ssl/privkey.pem
+    reverse_proxy ollama:11434
+}
