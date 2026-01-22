@@ -40,7 +40,7 @@ echo ""
 echo "=== Installiere grundlegende Tools ==="
 sudo DEBIAN_FRONTEND=noninteractive apt install -y \
     mc curl wget git htop gnupg lsb-release ca-certificates \
-    htop xfsprogs pciutils kmod build-essential mc
+    htop xfsprogs pciutils kmod
 
 echo ""
 echo "=== Erstelle Partition auf /dev/nvme1n1 ==="
