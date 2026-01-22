@@ -49,7 +49,7 @@ if [ ! -b /dev/nvme1n1 ]; then
 else
     if ! mountpoint -q /var/lib/docker 2>/dev/null; then
         DEVICE=/dev/nvme1n1
-        MOUNT=/mnt/instance-store        
+        MOUNT=/var/lib/docker        
         mkfs.xfs -f $DEVICE
         mkdir -p $MOUNT
         mount $DEVICE $MOUNT
