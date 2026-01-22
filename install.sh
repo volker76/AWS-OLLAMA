@@ -191,10 +191,6 @@ echo "=== Prüfe NVIDIA Module ==="
 find /lib/modules/$(uname -r) -name "nvidia*.ko" 2>/dev/null || echo "Keine Kernel-Module gefunden (Reboot erforderlich)"
 
 echo ""
-echo "=== Prüfe DKMS Status ==="
-sudo dkms status
-
-echo ""
 echo "=== Installiere Docker ==="
 
 if ! command -v docker &> /dev/null; then
