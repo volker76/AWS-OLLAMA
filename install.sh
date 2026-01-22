@@ -163,8 +163,8 @@ echo ""
 echo "=== Installiere NVIDIA Treiber ==="
 
 # Kernel Headers installieren
-sudo DEBIAN_FRONTEND=noninteractive apt install -y \
-    linux-headers-$(uname -r) dkms
+# sudo DEBIAN_FRONTEND=noninteractive apt install -y \
+#     linux-headers-$(uname -r) dkms
 
 # Installiere NVIDIA Treiber - Debian wählt automatisch die passende Version
 echo "Installiere NVIDIA Driver (Debian wählt Version automatisch)..."
