@@ -247,7 +247,7 @@ echo ""
 echo "=== Wende Tastatur-Konfiguration an ==="
 sudo dpkg-reconfigure -f noninteractive keyboard-configuration
 
-sudo docker run --rm --gpus all nvidia/cuda:latest nvidia-smi
+sudo docker run --rm --gpus all nvidia/cuda:13.0.2-runtime-ubuntu24.04 nvidia-smi
 
 docker pull ollama/ollama:latest
 
