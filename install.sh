@@ -250,7 +250,7 @@ if ! dpkg -l | grep -q nvidia-container-toolkit; then
       sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
 
     sudo apt update
-    sudo DEBIAN_FRONTEND=noninteractive apt install -y nvidia-container-toolkit
+    sudo DEBIAN_FRONTEND=noninteractive apt install -y nvidia-container-toolkit nvtop
 
     sudo nvidia-ctk runtime configure --runtime=docker
     sudo systemctl restart docker
