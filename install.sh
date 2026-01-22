@@ -23,8 +23,6 @@ sudo debconf-set-selections <<< 'keyboard-configuration keyboard-configuration/x
 
 echo ""
 echo "=== Aktiviere non-free Repositories ==="
-# Backup der debian.sources
-sudo cp /etc/apt/sources.list.d/debian.sources /etc/apt/sources.list.d/debian.sources.backup 2>/dev/null || true
 
 # Prüfe ob non-free bereits aktiviert ist
 if ! grep -q "non-free-firmware" /etc/apt/sources.list.d/debian.sources; then
