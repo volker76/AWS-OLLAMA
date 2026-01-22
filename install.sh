@@ -40,7 +40,7 @@ echo ""
 echo "=== Installiere grundlegende Tools ==="
 sudo DEBIAN_FRONTEND=noninteractive apt install -y \
     mc curl wget git htop gnupg lsb-release ca-certificates \
-    parted pciutils kmod build-essential mc
+    pciutils kmod build-essential mc
 
 echo ""
 echo "=== Erstelle Partition auf /dev/nvme1n1 ==="
@@ -48,34 +48,21 @@ if [ ! -b /dev/nvme1n1 ]; then
     echo "WARNUNG: /dev/nvme1n1 nicht gefunden - überspringe Partitionierung"
 else
     if ! mountpoint -q /var/lib/docker 2>/dev/null; then
-        if ! sudo parted /dev/nvme1n1 print 2>/dev/null | grep -q "Partition Table: gpt"; then
-            echo "Erstelle neue Partition..."
-            sudo parted /dev/nvme1n1 --script mklabel gpt
-            sudo parted /dev/nvme1n1 --script mkpart primary ext4 0% 100%
-            sleep 2
-
-            echo "Formatiere Partition mit ext4..."
-            sudo mkfs.ext4 -F /dev/nvme1n1p1
-        fi
-
-        echo "Erstelle Mount-Point /var/lib/docker..."
-        sudo mkdir -p /var/lib/docker
-
-        UUID=$(sudo blkid -s UUID -o value /dev/nvme1n1p1)
-        echo "Partition UUID: $UUID"
-
-        if ! grep -q "$UUID" /etc/fstab 2>/dev/null; then
-            echo "Füge Eintrag zu /etc/fstab hinzu..."
-            echo "UUID=$UUID /var/lib/docker ext4 defaults,nofail 0 2" | sudo tee -a /etc/fstab
-        fi
-
+        DEVICE=/dev/nvme1n1
+        MOUNT=/mnt/instance-store        
+        mkfs.xfs -f $DEVICE
+        mkdir -p $MOUNT
+        mount $DEVICE $MOUNT
+        
+        echo "$DEVICE $MOUNT xfs defaults,nofail 0 2" >> /etc/fstab
+        
         echo "Mounte die Partition..."
         sudo mount -a
         df -h /var/lib/docker
-    else
+     else
         echo "/var/lib/docker ist bereits gemountet"
-    fi
-fi
+     fi
+ fi
 
 # Swap-File auf /var/lib/docker erstellen (NVMe) mit vollständiger Prüfung
 SWAP_SIZE=10G
