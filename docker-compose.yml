@@ -8,7 +8,7 @@ services:
 
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - ./ssl:/etc/caddy/ssl:ro
+      - /etc/ssl:/etc/caddy/ssl:ro
       - caddy_data:/data
       - caddy_config:/config
     networks:
