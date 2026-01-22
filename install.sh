@@ -163,9 +163,9 @@ echo ""
 echo "=== Installiere NVIDIA Treiber ==="
 
 # Alte NVIDIA-Treiber komplett entfernen
-sudo apt remove --purge '^nvidia-.*' -y
-sudo apt autoremove -y
-sudo apt autoclean
+#sudo apt remove --purge '^nvidia-.*' -y
+#sudo apt autoremove -y
+#sudo apt autoclean
 
 # Kernel Headers installieren
 sudo DEBIAN_FRONTEND=noninteractive apt install -y \
@@ -173,7 +173,7 @@ sudo DEBIAN_FRONTEND=noninteractive apt install -y \
 
 # Installiere NVIDIA Treiber - Debian wählt automatisch die passende Version
 echo "Installiere NVIDIA Driver (Debian wählt Version automatisch)..."
-sudo DEBIAN_FRONTEND=noninteractive apt install -y nvidia-driver
+sudo DEBIAN_FRONTEND=noninteractive apt install -y nvidia-driver dkms
 
 echo ""
 echo "=== Prüfe NVIDIA Installation ==="
@@ -188,6 +188,9 @@ echo "NVIDIA DKMS Version: $NVIDIA_VERSION"
 
 # Update module dependencies
 sudo depmod -a
+
+dkms status
+
 
 echo ""
 echo "=== Prüfe NVIDIA Module ==="
