@@ -162,9 +162,14 @@ lspci | grep -i nvidia || echo "Keine NVIDIA GPU gefunden"
 echo ""
 echo "=== Installiere NVIDIA Treiber ==="
 
+# Alte NVIDIA-Treiber komplett entfernen
+sudo apt remove --purge '^nvidia-.*' -y
+sudo apt autoremove -y
+sudo apt autoclean
+
 # Kernel Headers installieren
-# sudo DEBIAN_FRONTEND=noninteractive apt install -y \
-#     linux-headers-$(uname -r) dkms
+sudo DEBIAN_FRONTEND=noninteractive apt install -y \
+     linux-headers-$(uname -r) 
 
 # Installiere NVIDIA Treiber - Debian wählt automatisch die passende Version
 echo "Installiere NVIDIA Driver (Debian wählt Version automatisch)..."
