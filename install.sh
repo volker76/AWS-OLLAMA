@@ -135,6 +135,31 @@ else
     echo "✓ Swappiness permanent gesetzt"
 fi
 
+# 1. Token holen (gültig für 6 Stunden)
+TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" \
+  -H "X-aws-ec2-metadata-token-ttl-seconds: 21600" -s)
+
+# 2. Public IP mit Token abfragen
+PUBLIC_IP=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" \
+  -s http://169.254.169.254/latest/meta-data/public-ipv4)
+
+echo $PUBLIC_IP
+
+# Verzeichnis erstellen
+cd /home/admin/AWS-OLLAMA
+mkdir -p ssl
+
+# Selbstsigniertes Zertifikat erstellen (gültig 1 Jahr)
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+  -keyout ssl/privkey.pem \
+  -out ssl/fullchain.pem \
+  -subj "/CN=$PUBLIC_IP" \
+  -addext "subjectAltName=IP:$PUBLIC_IP"
+
+# Berechtigungen setzen
+chmod 644 ssl/*.pem
+
+
 
 # Erstelle das Zielverzeichnis falls nicht vorhanden
 sudo mkdir -p /var/lib/docker/containerd
