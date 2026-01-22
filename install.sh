@@ -77,6 +77,80 @@ else
     fi
 fi
 
+# Swap-File auf /var/lib/docker erstellen (NVMe) mit vollständiger Prüfung
+SWAP_SIZE=10G
+SWAP_FILE=/var/lib/docker/swapfile
+
+echo "=== Erstelle 10GB Swap-File auf NVMe ==="
+echo ""
+
+# Prüfe ob Swap-File bereits existiert und aktiviert ist
+if [ -f "$SWAP_FILE" ]; then
+    echo "Swap-File existiert bereits: $SWAP_FILE"
+    
+    # Prüfe ob es bereits aktiviert ist
+    if sudo swapon --show | grep -q "$SWAP_FILE"; then
+        echo "✓ Swap-File ist bereits aktiv"
+    else
+        echo "⚠ Swap-File existiert, aber ist nicht aktiv. Aktiviere..."
+        sudo swapon $SWAP_FILE
+        echo "✓ Swap aktiviert"
+    fi
+else
+    echo "Erstelle Swap-File ($SWAP_SIZE)..."
+    sudo fallocate -l $SWAP_SIZE $SWAP_FILE
+    
+    echo "Setze Berechtigungen..."
+    sudo chmod 600 $SWAP_FILE
+    
+    echo "Erstelle Swap-Space..."
+    sudo mkswap $SWAP_FILE
+    
+    echo "Aktiviere Swap..."
+    sudo swapon $SWAP_FILE
+    echo "✓ Swap-File erstellt und aktiviert"
+fi
+
+echo ""
+echo "Prüfe /etc/fstab Eintrag..."
+if grep -q "$SWAP_FILE" /etc/fstab; then
+    echo "✓ Eintrag in /etc/fstab bereits vorhanden"
+else
+    echo "Füge zu /etc/fstab hinzu (permanent)..."
+    echo "$SWAP_FILE none swap sw 0 0" | sudo tee -a /etc/fstab
+    echo "✓ Eintrag zu /etc/fstab hinzugefügt"
+fi
+
+echo ""
+echo "Prüfe Swappiness-Einstellung..."
+CURRENT_SWAPPINESS=$(cat /proc/sys/vm/swappiness)
+echo "Aktuelle Swappiness: $CURRENT_SWAPPINESS"
+
+if [ "$CURRENT_SWAPPINESS" -ne 10 ]; then
+    echo "Setze Swappiness auf 10 (temporär)..."
+    sudo sysctl vm.swappiness=10
+    echo "✓ Swappiness temporär gesetzt"
+else
+    echo "✓ Swappiness ist bereits auf 10 gesetzt"
+fi
+
+if grep -q "^vm.swappiness" /etc/sysctl.conf; then
+    CONF_SWAPPINESS=$(grep "^vm.swappiness" /etc/sysctl.conf | cut -d'=' -f2 | tr -d ' ')
+    if [ "$CONF_SWAPPINESS" = "10" ]; then
+        echo "✓ Swappiness in /etc/sysctl.conf bereits auf 10 gesetzt"
+    else
+        echo "⚠ Swappiness in /etc/sysctl.conf ist $CONF_SWAPPINESS (nicht 10)"
+        echo "Aktualisiere /etc/sysctl.conf..."
+        sudo sed -i 's/^vm.swappiness=.*/vm.swappiness=10/' /etc/sysctl.conf
+        echo "✓ Swappiness in /etc/sysctl.conf aktualisiert"
+    fi
+else
+    echo "Füge Swappiness zu /etc/sysctl.conf hinzu (permanent)..."
+    echo 'vm.swappiness=10' | sudo tee -a /etc/sysctl.conf
+    echo "✓ Swappiness permanent gesetzt"
+fi
+
+
 # Erstelle das Zielverzeichnis falls nicht vorhanden
 sudo mkdir -p /var/lib/docker/containerd
 
