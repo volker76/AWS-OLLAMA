@@ -8,7 +8,7 @@ services:
     ports:
       - "11434:11434"
     volumes:
-      - /var/lib/ollama:/root/.ollama
+      - ollama:/root/.ollama
     deploy:
       resources:
         reservations:
@@ -19,3 +19,27 @@ services:
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: unless-stopped
+    ports:
+      - "3000:8080"
+    volumes:
+      - open-webui-data:/app/backend/data
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - WEBUI_SECRET_KEY=changeme_to_random_string
+      - WEBUI_NAME=Ollama WebUI
+    depends_on:
+      - ollama
+    networks:
+      - ollama-network
+
+volumes:
+  open-webui-data:
+  ollama:
+  
+networks:
+  ollama-network:
+    driver: bridge
