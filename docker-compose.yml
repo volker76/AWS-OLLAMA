@@ -1,12 +1,28 @@
 version: '3.8'
 
 services:
+  caddy:
+    image: caddy:alpine
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "443:443"   # Ollama API
+      - "8443:8443" # WebUI
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./ssl:/etc/caddy/ssl:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - ollama-network
+    depends_on:
+      - ollama
   ollama:
     image: ollama/ollama:latest
     container_name: ollama
     restart: unless-stopped
     ports:
-      - "11434:11434"
+      - "11434"
     volumes:
       - ollama:/root/.ollama
     deploy:
@@ -28,7 +44,7 @@ services:
     container_name: open-webui
     restart: unless-stopped
     ports:
-      - "80:8080"
+      - "8080"
     volumes:
       - open-webui-data:/app/backend/data
     environment:
@@ -43,6 +59,8 @@ services:
 volumes:
   open-webui-data:
   ollama:
+  caddy_data:
+  caddy_config:
   
 networks:
   ollama-network:
