@@ -1,5 +1,13 @@
-# Ollama API auf Port 443
 https://:443 {
     tls /etc/caddy/ssl/fullchain.pem /etc/caddy/ssl/privkey.pem
-    reverse_proxy ollama:11434
+
+    @unauthorized {
+        not header Authorization "Bearer SUPER_SECRET_KEY"
+    }
+
+    respond @unauthorized 401 {
+        body "Unauthorized"
+    }
+
+    reverse_proxy vllm:8000
 }
